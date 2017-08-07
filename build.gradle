@@ -1,4 +1,4 @@
-group 'fireball'
+group 'com.github.carlosmenezes'
 version '0.1-SNAPSHOT'
 rootProject.description 'A library for kafka topologies testing.'
 
@@ -6,6 +6,8 @@ buildscript {
     ext {
         kafkaVersion = "0.11.0.0"
         rocksDBVersion = "5.0.1"
+        isReleaseVersion = !version.endsWith("SNAPSHOT")
+
     }
 
     repositories {
@@ -50,6 +52,7 @@ artifacts {
 }
 
 signing {
+    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
 }
 
@@ -140,7 +143,6 @@ def customizePom(pom, gradleProject) {
                     id 'carlos'
                     name 'Carlos Menezes'
                     email 'pachecomenezes@gmail.com'
-                    timezone '+1'
                 }
                 developer {
                     id 'diego'

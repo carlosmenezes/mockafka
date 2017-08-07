@@ -1,4 +1,4 @@
-package fireball.mockafka.util;
+package com.github.carlosmenezes.mockafka.util;
 
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;

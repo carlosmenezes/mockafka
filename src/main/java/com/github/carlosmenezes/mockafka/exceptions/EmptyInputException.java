@@ -1,4 +1,4 @@
-package fireball.mockafka.exceptions;
+package com.github.carlosmenezes.mockafka.exceptions;
 
 public class EmptyInputException extends Exception {
 

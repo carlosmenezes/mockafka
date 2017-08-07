@@ -1,8 +1,8 @@
-package fireball.mockafka;
+package com.github.carlosmenezes.mockafka;
 
-import fireball.mockafka.exceptions.EmptyInputException;
-import fireball.mockafka.exceptions.EmptyOutputSizeException;
-import fireball.mockafka.exceptions.NoTopologyException;
+import com.github.carlosmenezes.mockafka.exceptions.EmptyInputException;
+import com.github.carlosmenezes.mockafka.exceptions.EmptyOutputSizeException;
+import com.github.carlosmenezes.mockafka.exceptions.NoTopologyException;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;

@@ -1,4 +1,4 @@
-package fireball.mockafka;
+package com.github.carlosmenezes.mockafka;
 
 import java.util.ArrayList;
 import java.util.HashMap;
