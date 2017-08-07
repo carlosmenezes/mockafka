@@ -1,9 +1,9 @@
 package com.github.carlosmenezes.mockafka;
 
+import com.github.carlosmenezes.mockafka.exceptions.EmptyInputException;
 import com.github.carlosmenezes.mockafka.exceptions.EmptyOutputSizeException;
 import com.github.carlosmenezes.mockafka.exceptions.NoTopologyException;
 import com.github.carlosmenezes.mockafka.util.TopologyUtil;
-import com.github.carlosmenezes.mockafka.exceptions.EmptyInputException;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Test;
 
