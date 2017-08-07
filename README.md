@@ -4,6 +4,23 @@ Mockafka
 Mockafka is a DSL which allows testing of kafka topologies without need of a
 kafka and zookeeper installation. It is a Java 8 port of [jpzk/mockedstreams](https://github.com/jpzk/mockedstreams).
 
+Add it to your `pom.xml`...
+
+```xml
+<dependency>
+  <groupId>com.github.carlosmenezes</groupId>
+  <artifactId>mockafka</artifactId>
+  <version>0.1</version>
+  <scope>test</scope>
+</dependency>
+```
+
+or to your build.gradle.
+
+```groovy
+testCompile "com.github.carlosmenezes:mockafka:0.1"
+```
+
 Examples
 -------
 
