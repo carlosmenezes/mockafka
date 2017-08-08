@@ -1,5 +1,5 @@
 group 'com.github.carlosmenezes'
-version '0.1'
+version '0.1.1'
 rootProject.description 'A library for kafka topologies testing.'
 
 buildscript {

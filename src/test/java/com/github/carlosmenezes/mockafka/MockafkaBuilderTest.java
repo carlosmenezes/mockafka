@@ -4,29 +4,32 @@ import com.github.carlosmenezes.mockafka.exceptions.EmptyInputException;
 import com.github.carlosmenezes.mockafka.exceptions.EmptyOutputSizeException;
 import com.github.carlosmenezes.mockafka.exceptions.NoTopologyException;
 import com.github.carlosmenezes.mockafka.util.TopologyUtil;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.common.serialization.Serdes;
 import org.junit.Test;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Stream.of;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MockafkaBuilderTest {
 
     @Test
     public void doStreamChangingValueToUpperCase() throws EmptyOutputSizeException, NoTopologyException, EmptyInputException {
 
-        List<ProducerRecord<String, String>> output = Mockafka
+        Map<String, String> output = Mockafka
             .builder()
             .topology(TopologyUtil::upperCaseTopology)
             .input(TopologyUtil.INPUT_TOPIC_A, TopologyUtil.stringSerde, TopologyUtil.stringSerde, createInputKeyValue())
             .output(TopologyUtil.OUTPUT_TOPIC_A, TopologyUtil.stringSerde, TopologyUtil.stringSerde, 1);
 
-        assertEquals("somekey", output.get(0).key());
-        assertEquals("SOMEVALUE", output.get(0).value());
+        assertTrue(output.containsKey("somekey"));
+        assertEquals("SOMEVALUE", output.get("somekey"));
         assertEquals(1, output.size());
     }
 
@@ -50,15 +53,39 @@ public class MockafkaBuilderTest {
             .input(TopologyUtil.INPUT_TOPIC_B, TopologyUtil.stringSerde, TopologyUtil.integerSerde, createInputKeyValueB())
             .stores(asList(TopologyUtil.STORAGE_NAME));
 
-        List<ProducerRecord<String, String>> outputA = builder.output(TopologyUtil.OUTPUT_TOPIC_A, TopologyUtil.stringSerde, TopologyUtil.integerSerde, 1);
-        List<ProducerRecord<String, String>> outputB = builder.output(TopologyUtil.OUTPUT_TOPIC_B, TopologyUtil.stringSerde, TopologyUtil.integerSerde, 1);
+        Map<String, Integer> outputA = builder.output(TopologyUtil.OUTPUT_TOPIC_A, TopologyUtil.stringSerde, TopologyUtil.integerSerde, 1);
+        Map<String, Integer> outputB = builder.output(TopologyUtil.OUTPUT_TOPIC_B, TopologyUtil.stringSerde, TopologyUtil.integerSerde, 1);
 
         assertEquals(1, outputA.size());
         assertEquals(1, outputB.size());
-        assertEquals(84, outputA.get(0).value());
-        assertEquals(0, outputB.get(0).value());
+        assertEquals(84, (long) outputA.get("somekey"));
+        assertEquals(0, (long) outputB.get("somekey"));
         assertEquals(1, builder.stateTable(TopologyUtil.STORAGE_NAME).size());
         assertEquals(42, builder.stateTable(TopologyUtil.STORAGE_NAME).get("somekey"));
+    }
+
+    @Test
+    public void doNotChangeOutputOrder() throws EmptyOutputSizeException, NoTopologyException, EmptyInputException {
+        Map<Integer, Integer> input = of(1, 2, 3, 4, 5, 6, 7)
+            .collect(toMap(k -> k, v -> v ));
+
+        Serde<Integer> integerSerde = Serdes.Integer();
+
+        Map<Integer, Integer> output = Mockafka
+            .builder()
+            .topology(builder ->
+                builder.stream(integerSerde, integerSerde, "numbersTopic")
+                    .filter((key, value) -> value % 2 == 1)
+                    .to(integerSerde, integerSerde, "oddNumbersTopic")
+            )
+            .input("numbersTopic", integerSerde, integerSerde, input)
+            .output("oddNumbersTopic", integerSerde, integerSerde, 4);
+
+        assertEquals(4, output.size());
+        assertEquals(1, (int) output.get(1));
+        assertEquals(3, (int) output.get(3));
+        assertEquals(5, (int) output.get(5));
+        assertEquals(7, (int) output.get(7));
     }
 
     @Test(expected = EmptyInputException.class)

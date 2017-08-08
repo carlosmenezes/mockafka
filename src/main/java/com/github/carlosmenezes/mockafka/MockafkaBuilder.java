@@ -13,7 +13,7 @@ import org.apache.kafka.streams.state.ReadOnlyWindowStore;
 import org.apache.kafka.streams.state.WindowStoreIterator;
 import org.apache.kafka.test.ProcessorTopologyTestDriver;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +22,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 import static org.apache.kafka.streams.StreamsConfig.APPLICATION_ID_CONFIG;
@@ -62,33 +61,42 @@ public class MockafkaBuilder {
         Serializer<V> valueSerializer = valueSerde.serializer();
 
         Map<byte[], byte[]> convertedData = data.entrySet().stream()
-            .collect(toMap(e -> keySerializer.serialize(topic, e.getKey()), e -> valueSerializer.serialize(topic, e.getValue())));
+            .collect(toMap(
+                e -> keySerializer.serialize(topic, e.getKey()),
+                e -> valueSerializer.serialize(topic, e.getValue()),
+                (v1, v2) -> { throw new RuntimeException(String.format("Duplicate key for values %s and %s", v1, v2));},
+                LinkedHashMap::new));
 
         inputs.put(topic, new MockafkaInput(convertedData));
         return this;
     }
 
-    public <K, V> List output(String topic, Serde<K> keySerde, Serde<V> valueSerde, int size) throws EmptyOutputSizeException, EmptyInputException, NoTopologyException {
+    public <K, V> Map<K, V> output(String topic, Serde<K> keySerde, Serde<V> valueSerde, int size) throws EmptyOutputSizeException, EmptyInputException, NoTopologyException {
         if (size < 1) throw new EmptyOutputSizeException();
 
         return withProcessedDriver(driver ->
             range(0, size).mapToObj(i -> {
                 Optional<ProducerRecord<K, V>> output = Optional.ofNullable(driver.readOutput(topic, keySerde.deserializer(), valueSerde.deserializer()));
                 return output.isPresent() ? output.get() : Optional.empty();
-            }).collect(toList())
+            })
+            .collect(toMap(
+                pr -> ((ProducerRecord<K, V>) pr).key(),
+                pr -> ((ProducerRecord<K, V>) pr).value(),
+                (v1, v2) -> { throw new RuntimeException(String.format("Duplicate key for values %s and %s", v1, v2));},
+                LinkedHashMap::new
+            ))
         );
     }
 
     public <K, V> Map<K, V> outputTable(String topic, Serde<K> keySerde, Serde<V> valueSerde, int size) throws EmptyOutputSizeException, NoTopologyException, EmptyInputException {
-        return (Map<K, V>) output(topic, keySerde, valueSerde, size).stream()
-            .collect(toMap((ProducerRecord<K, V> e) -> e.key(), (ProducerRecord<K, V> e) -> e.value()));
+        return output(topic, keySerde, valueSerde, size);
     }
 
     public <K, V> Map<K, V> stateTable(String name) throws EmptyInputException, NoTopologyException {
         return withProcessedDriver(driver -> {
             KeyValueIterator<Object, Object> records = driver.getKeyValueStore(name).all();
 
-            Map<K, V> result = new HashMap<>();
+            Map<K, V> result = new LinkedHashMap<>();
             records.forEachRemaining(record -> result.put((K) record.key, (V) record.value));
             records.close();
             return result;
@@ -101,7 +109,7 @@ public class MockafkaBuilder {
             ReadOnlyWindowStore<K, V> store = (ReadOnlyWindowStore<K, V>) driver.getStateStore(name);
             WindowStoreIterator<V> records = store.fetch(key, from, timeTo);
 
-            Map<K, V> result = new HashMap<>();
+            Map<K, V> result = new LinkedHashMap<>();
             records.forEachRemaining(record -> result.put((K) record.key, record.value));
             records.close();
 
@@ -115,7 +123,7 @@ public class MockafkaBuilder {
         properties.putIfAbsent(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
         KStreamBuilder builder = new KStreamBuilder();
-        Consumer<KStreamBuilder> builderConsumer = topology.orElseThrow(() -> new NoTopologyException());
+        Consumer<KStreamBuilder> builderConsumer = topology.orElseThrow(NoTopologyException::new);
         builderConsumer.accept(builder);
 
         return new ProcessorTopologyTestDriver(new StreamsConfig(properties), builder);

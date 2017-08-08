@@ -10,15 +10,15 @@ Add it to your `pom.xml`...
 <dependency>
   <groupId>com.github.carlosmenezes</groupId>
   <artifactId>mockafka</artifactId>
-  <version>0.1</version>
+  <version>0.1.1</version>
   <scope>test</scope>
 </dependency>
 ```
 
-or to your build.gradle.
+or to your `build.gradle`.
 
 ```groovy
-testCompile "com.github.carlosmenezes:mockafka:0.1"
+testCompile "com.github.carlosmenezes:mockafka:0.1.1"
 ```
 
 Examples
@@ -30,7 +30,7 @@ Map<Integer, Integer> input = Stream.of(1, 2, 3, 4, 5, 6, 7)
 
 Serde<Integer> integerSerde = Serdes.Integer();
 
-List<ProducerRecord<Integer, Integer>> output = Mockafka
+Map<Integer, Integer> output = Mockafka
     .builder()
     .topology(builder ->
         builder.stream(integerSerde, integerSerde, "numbersTopic")
@@ -40,6 +40,9 @@ List<ProducerRecord<Integer, Integer>> output = Mockafka
     .input("numbersTopic", integerSerde, integerSerde, input)
     .output("oddNumbersTopic", integerSerde, integerSerde, 4);
 
-System.out.println(output);
 assertEquals(4, output.size());
+assertEquals(1, (int) output.get(1));
+assertEquals(3, (int) output.get(3));
+assertEquals(5, (int) output.get(5));
+assertEquals(7, (int) output.get(7));
 ``` 
