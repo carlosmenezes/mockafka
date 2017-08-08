@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 import static org.apache.kafka.streams.StreamsConfig.APPLICATION_ID_CONFIG;
@@ -51,8 +52,8 @@ public class MockafkaBuilder {
     }
 
 
-    public MockafkaBuilder stores(List<String> stores) {
-        this.stateStores.addAll(stores);
+    public MockafkaBuilder stores(String... stores) {
+        this.stateStores.addAll(asList(stores));
         return this;
     }
 

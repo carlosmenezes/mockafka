@@ -1,7 +1,7 @@
 Mockafka
 =======
 
-Mockafka is a DSL which allows testing of kafka topologies without need of a
+Mockafka is a DSL which allows testing of kafka-streams topologies without need of a
 kafka and zookeeper installation. It is a Java 8 port of [jpzk/mockedstreams](https://github.com/jpzk/mockedstreams).
 
 Add it to your `pom.xml`...
@@ -46,3 +46,35 @@ assertEquals(3, (int) output.get(3));
 assertEquals(5, (int) output.get(5));
 assertEquals(7, (int) output.get(7));
 ``` 
+
+Multiple inputs/outputs
+-------
+
+```java
+MockafkaBuilder builder = Mockafka
+  .builder()
+  .topology(builder -> {...})
+  .input("someInput", Serdes.String(), Serdes.String(), someInput)
+  .input("anotherInput", Serdes.String(), Serdes.String(), anotherInput);
+  
+Map<String, String> someOutput = builder.output("someOutput", Serdes.String(), Serdes.String(), 10);
+Map<String, String> anotherOutput = builder.output("anotherOutput", Serdes.String(), Serdes.String(), 10);
+```
+
+Using State Stores
+-------
+
+You can create state stores using `.stores(String... stores)` method and verify
+it's contents with `.stateTable(String name)` method:
+
+```java
+MockafkaBuilder builder = Mockafka
+  .builder()
+  .topology(builder -> {...})
+  .input("someInput", Serdes.String(), Serdes.String(), someInput)
+  .stores("someStore");
+  
+Map<String, String> someStore = builder.stateTable("someStore");  
+assertEquals(10, someStore.size());
+```
+

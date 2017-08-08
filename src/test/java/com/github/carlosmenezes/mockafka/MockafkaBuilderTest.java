@@ -11,7 +11,6 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.of;
 import static org.junit.Assert.assertEquals;
@@ -51,7 +50,7 @@ public class MockafkaBuilderTest {
             .topology(TopologyUtil::joinTopology)
             .input(TopologyUtil.INPUT_TOPIC_A, TopologyUtil.stringSerde, TopologyUtil.integerSerde, createInputKeyValueB())
             .input(TopologyUtil.INPUT_TOPIC_B, TopologyUtil.stringSerde, TopologyUtil.integerSerde, createInputKeyValueB())
-            .stores(asList(TopologyUtil.STORAGE_NAME));
+            .stores(TopologyUtil.STORAGE_NAME);
 
         Map<String, Integer> outputA = builder.output(TopologyUtil.OUTPUT_TOPIC_A, TopologyUtil.stringSerde, TopologyUtil.integerSerde, 1);
         Map<String, Integer> outputB = builder.output(TopologyUtil.OUTPUT_TOPIC_B, TopologyUtil.stringSerde, TopologyUtil.integerSerde, 1);

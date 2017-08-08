@@ -127,7 +127,7 @@ def customizePom(pom, gradleProject) {
             }
             licenses {
                 license {
-                    name 'The New BSD License'
+                    name 'The MIT License'
                     url 'https://github.com/carlosmenezes/mockafka/blob/master/LICENSE'
                     distribution 'repo'
                 }
