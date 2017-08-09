@@ -1,6 +1,8 @@
 Mockafka
 =======
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2719b4636f134b359fa13ba33fed24ad)](https://www.codacy.com/app/pachecomenezes/mockafka?utm_source=github.com&utm_medium=referral&utm_content=carlosmenezes/mockafka&utm_campaign=badger)
+
 Mockafka is a DSL which allows testing of kafka-streams topologies without need of a
 kafka and zookeeper installation. It is a Java 8 port of [jpzk/mockedstreams](https://github.com/jpzk/mockedstreams).
 
