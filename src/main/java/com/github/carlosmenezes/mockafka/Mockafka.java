@@ -10,6 +10,6 @@ public class Mockafka {
     }
 
     public static MockafkaBuilder builder() {
-        return new MockafkaBuilder(new Properties(), new ArrayList<String>(), new LinkedHashMap<String, MockafkaBuilder.MockafkaInput>());
+        return new MockafkaBuilder(new Properties(), new ArrayList<>(), new LinkedHashMap<>());
     }
 }
