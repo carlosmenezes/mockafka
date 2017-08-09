@@ -20,7 +20,7 @@ Add it to your `pom.xml`...
 or to your `build.gradle`.
 
 ```groovy
-testCompile "com.github.carlosmenezes:mockafka:0.1.1"
+testCompile "com.github.carlosmenezes:mockafka:0.1.2"
 ```
 
 Examples
