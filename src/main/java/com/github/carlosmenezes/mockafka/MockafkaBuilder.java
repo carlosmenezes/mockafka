@@ -103,11 +103,11 @@ public class MockafkaBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    public <K, V> Map<K, V> windowStateTable(String name, K key, long from, long timeTo) throws EmptyInputException, NoTopologyException {
+    public <K, V> Map<K, V> windowStateTable(String name, K key, long timeFrom, long timeTo) throws EmptyInputException, NoTopologyException {
 
         return withProcessedDriver(driver -> {
             ReadOnlyWindowStore<K, V> store = (ReadOnlyWindowStore<K, V>) driver.getStateStore(name);
-            WindowStoreIterator<V> records = store.fetch(key, from, timeTo);
+            WindowStoreIterator<V> records = store.fetch(key, timeFrom, timeTo);
 
             Map<K, V> result = new LinkedHashMap<>();
             records.forEachRemaining(record -> result.put((K) record.key, record.value));

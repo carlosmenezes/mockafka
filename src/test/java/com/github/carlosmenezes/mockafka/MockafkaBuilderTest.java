@@ -9,6 +9,7 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsConfig;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,11 +91,9 @@ public class MockafkaBuilderTest {
             .input("numbersTopic", integerSerde, integerSerde, input.toArray(new Message[]{}))
             .output("oddNumbersTopic", integerSerde, integerSerde, 4);
 
+        List<Message<Integer, Integer>> expected = Arrays.asList(new Message<>(1, 1), new Message<>(3, 3), new Message<>(5, 5), new Message<>(7, 7));
         assertEquals(4, output.size());
-        assertEquals(1, (int) output.get(0).getValue());
-        assertEquals(3, (int) output.get(1).getValue());
-        assertEquals(5, (int) output.get(2).getValue());
-        assertEquals(7, (int) output.get(3).getValue());
+        assertEquals(expected, output);
     }
 
     @SuppressWarnings("unchecked")
