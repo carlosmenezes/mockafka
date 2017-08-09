@@ -12,7 +12,7 @@ Add it to your `pom.xml`...
 <dependency>
   <groupId>com.github.carlosmenezes</groupId>
   <artifactId>mockafka</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <scope>test</scope>
 </dependency>
 ```
